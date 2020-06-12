@@ -15,6 +15,15 @@ const SlateEditor = () => {
     },
   ]);
 
+  const fixAnd = (e) => {
+    if (e.key === "&") {
+      // prevent the ampersand character from being inserted
+      e.preventDefault();
+      // Exeute the 'insertText' method when the event occurs to insert and instead of &.
+      editor.insertText("and");
+    }
+  };
+
   return (
     // You can think of the <Slate /> component as providing "controlled" context to every component inside it.
     <Slate
@@ -22,7 +31,7 @@ const SlateEditor = () => {
       value={value}
       onChange={(newValue) => setValue(newValue)}
     >
-      <Editable />
+      <Editable onKeyDown={(e) => fixAnd(e)} />
     </Slate>
   );
 };
