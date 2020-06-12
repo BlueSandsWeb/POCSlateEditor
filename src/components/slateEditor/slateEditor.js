@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 
-import { createEditor } from "slate";
+import { createEditor, Transforms, Editor } from "slate";
 
 import { Slate, Editable, withReact } from "slate-react";
 
@@ -24,6 +24,17 @@ const SlateEditor = () => {
     }
   };
 
+  // Define a rendering function based on the element passed to `props`. we use `useCallback` here to memoize the function for subsequent renders.
+  const renderElement = useCallback((props) => {
+    switch (props.element.type) {
+      case "code":
+        return <CodeElement {...props} />;
+
+      default:
+        return <DefaultElement {...props} />;
+    }
+  }, []);
+
   return (
     // You can think of the <Slate /> component as providing "controlled" context to every component inside it.
     <Slate
@@ -31,9 +42,37 @@ const SlateEditor = () => {
       value={value}
       onChange={(newValue) => setValue(newValue)}
     >
-      <Editable onKeyDown={(e) => fixAnd(e)} />
+      <Editable
+        onKeyDown={(e) => fixAnd(e)}
+        renderElement={renderElement}
+        onKeyUp={(e) => {
+          if (e.key === "`" && e.ctrlKey) {
+            e.preventDefault();
+            console.log("TRUE");
+            Transforms.setNodes(
+              editor,
+              { type: "code" },
+              { match: (n) => Editor.isBlock(editor, n) }
+            );
+          }
+        }}
+      />
     </Slate>
   );
 };
 
 export default SlateEditor;
+
+// Define a React component renderer for our code blocks.
+const CodeElement = (props) => {
+  return (
+    <pre {...props.attributes} style={{ background: "#ccc" }}>
+      <code>{props.children}</code>
+    </pre>
+  );
+};
+
+// DEFAULT element / p tag
+const DefaultElement = (props) => {
+  return <p {...props.attributes}>{props.children}</p>;
+};
