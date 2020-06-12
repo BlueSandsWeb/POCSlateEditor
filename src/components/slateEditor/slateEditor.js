@@ -35,6 +35,20 @@ const SlateEditor = () => {
     }
   }, []);
 
+  const elementSelector = (e) => {
+    e.preventDefault();
+    const [match] = Editor.nodes(editor, {
+      match: (n) => n.type === "code",
+    });
+    if (e.key === "`" && e.ctrlKey) {
+      Transforms.setNodes(
+        editor,
+        { type: match ? "paragraph" : "code" },
+        { match: (n) => Editor.isBlock(editor, n) }
+      );
+    }
+  };
+
   return (
     // You can think of the <Slate /> component as providing "controlled" context to every component inside it.
     <Slate
@@ -45,17 +59,7 @@ const SlateEditor = () => {
       <Editable
         onKeyDown={(e) => fixAnd(e)}
         renderElement={renderElement}
-        onKeyUp={(e) => {
-          if (e.key === "`" && e.ctrlKey) {
-            e.preventDefault();
-            console.log("TRUE");
-            Transforms.setNodes(
-              editor,
-              { type: "code" },
-              { match: (n) => Editor.isBlock(editor, n) }
-            );
-          }
-        }}
+        onKeyUp={(e) => elementSelector(e)}
       />
     </Slate>
   );
