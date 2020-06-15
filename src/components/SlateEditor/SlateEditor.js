@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
+import styles from "./SlateEditor.module.scss";
 
 import { createEditor, Transforms, Editor, Text } from "slate";
 
@@ -21,6 +22,14 @@ const SlateEditor = () => {
       case "code":
         return <CodeElement {...props} />;
 
+      case "h1":
+        return <H1Element {...props} />;
+      case "h2":
+        return <H2Element {...props} />;
+      case "h3":
+        return <H3Element {...props} />;
+      case "ul":
+        return <ULElement {...props} />;
       default:
         return <DefaultElement {...props} />;
     }
@@ -112,6 +121,38 @@ const SlateEditor = () => {
         >
           Code Block
         </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            CustomEditor.toggleH1(editor);
+          }}
+        >
+          h1
+        </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            CustomEditor.toggleH2(editor);
+          }}
+        >
+          h2
+        </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            CustomEditor.toggleH3(editor);
+          }}
+        >
+          h3
+        </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            CustomEditor.toggleUL(editor);
+          }}
+        >
+          Bullet List
+        </button>
       </div>
       <Editable
         renderElement={renderElement}
@@ -130,6 +171,34 @@ const CodeElement = (props) => {
     <pre {...props.attributes} style={{ background: "#ccc" }}>
       <code>{props.children}</code>
     </pre>
+  );
+};
+const H1Element = (props) => {
+  return (
+    <h1 {...props.attributes} className={styles.h1}>
+      {props.children}
+    </h1>
+  );
+};
+const H2Element = (props) => {
+  return (
+    <h2 {...props.attributes} className={styles.h2}>
+      {props.children}
+    </h2>
+  );
+};
+const H3Element = (props) => {
+  return (
+    <h3 {...props.attributes} className={styles.h3}>
+      {props.children}
+    </h3>
+  );
+};
+const ULElement = (props) => {
+  return (
+    <ul {...props.attributes} className={styles.ul}>
+      <li>{props.children}</li>
+    </ul>
   );
 };
 
@@ -216,6 +285,30 @@ const CustomEditor = {
     });
     return !!match;
   },
+  isH1Active(editor) {
+    const [match] = Editor.nodes(editor, {
+      match: (n) => n.type === "h1",
+    });
+    return !!match;
+  },
+  isH2Active(editor) {
+    const [match] = Editor.nodes(editor, {
+      match: (n) => n.type === "h2",
+    });
+    return !!match;
+  },
+  isH3Active(editor) {
+    const [match] = Editor.nodes(editor, {
+      match: (n) => n.type === "h3",
+    });
+    return !!match;
+  },
+  isULActive(editor) {
+    const [match] = Editor.nodes(editor, {
+      match: (n) => n.type === "ul",
+    });
+    return !!match;
+  },
 
   // =================== Toggle Section =================== //
 
@@ -263,6 +356,39 @@ const CustomEditor = {
     Transforms.setNodes(
       editor,
       { type: isActive ? null : "code" },
+      { match: (n) => Editor.isBlock(editor, n) }
+    );
+  },
+  toggleH1(editor) {
+    const isActive = CustomEditor.isH1Active(editor);
+    Transforms.setNodes(
+      editor,
+      { type: isActive ? null : "h1" },
+
+      { match: (n) => Editor.isBlock(editor, n) }
+    );
+  },
+  toggleH2(editor) {
+    const isActive = CustomEditor.isH2Active(editor);
+    Transforms.setNodes(
+      editor,
+      { type: isActive ? null : "h2" },
+      { match: (n) => Editor.isBlock(editor, n) }
+    );
+  },
+  toggleH3(editor) {
+    const isActive = CustomEditor.isH3Active(editor);
+    Transforms.setNodes(
+      editor,
+      { type: isActive ? null : "h3" },
+      { match: (n) => Editor.isBlock(editor, n) }
+    );
+  },
+  toggleUL(editor) {
+    const isActive = CustomEditor.isULActive(editor);
+    Transforms.setNodes(
+      editor,
+      { type: isActive ? null : "ul" },
       { match: (n) => Editor.isBlock(editor, n) }
     );
   },

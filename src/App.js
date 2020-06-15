@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import SlateEditor from "./components/slateEditor/slateEditor";
+import SlateEditor from "./components/SlateEditor/SlateEditor";
 
 function App() {
   return (
